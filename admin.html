@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Umme Ibrahim Studio</title>
+<style>
+:root{--gold:#B8922A;--gold-light:#D4AE5A;--dark:#1E1A14;--dark2:#2a2318;--cream:#F7F3EC;--green:#3A5C3A;--red:#c0392b;--muted:#8C7A60;--border:rgba(184,146,42,0.2);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:system-ui,'DM Sans',sans-serif;background:#0f0d0a;color:#e8e0d0;min-height:100vh;}
+
+/* LOGIN */
+#loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0f0d0a,#1e1a14);}
+.login-box{background:#1e1a14;border:1px solid var(--border);border-radius:20px;padding:2.8rem;width:90%;max-width:380px;text-align:center;}
+.login-logo{font-size:3rem;margin-bottom:1rem;}
+.login-box h1{font-size:1.5rem;color:var(--gold-light);margin-bottom:0.3rem;}
+.login-box p{color:var(--muted);font-size:0.82rem;margin-bottom:2rem;}
+.login-box input{width:100%;padding:13px 16px;background:var(--dark2);border:1px solid var(--border);border-radius:10px;color:#e8e0d0;font-size:0.95rem;margin-bottom:1rem;outline:none;font-family:inherit;}
+.login-box input:focus{border-color:var(--gold);}
+.btn-login{width:100%;padding:13px;background:var(--gold);color:#1e1a14;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;transition:background 0.2s;font-family:inherit;}
+.btn-login:hover{background:var(--gold-light);}
+.login-err{color:#e74c3c;font-size:0.82rem;margin-top:0.5rem;display:none;}
+
+/* MAIN */
+#adminPage{display:none;}
+.admin-header{background:#1e1a14;border-bottom:2px solid var(--gold);padding:0 1.5rem;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.admin-header-left{display:flex;align-items:center;gap:10px;}
+.admin-header h1{color:var(--gold-light);font-size:1rem;font-weight:600;}
+.btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:0.8rem;font-family:inherit;}
+.btn-logout:hover{color:var(--gold-light);border-color:var(--gold);}
+.btn-visit{background:var(--green);color:white;border:none;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:0.8rem;text-decoration:none;font-weight:600;}
+
+/* TABS */
+.tabs{display:flex;overflow-x:auto;gap:0;border-bottom:1px solid var(--border);padding:0 1.5rem;background:#1a1610;}
+.tab{padding:13px 18px;cursor:pointer;font-size:0.82rem;white-space:nowrap;color:var(--muted);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;transition:all 0.2s;}
+.tab.active,.tab:hover{color:var(--gold-light);border-bottom-color:var(--gold);}
+
+.content{padding:1.5rem;max-width:860px;margin:0 auto;}
+.sec-title{font-size:1.1rem;color:var(--gold-light);margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.btn-add{background:var(--green);color:white;border:none;padding:9px 18px;border-radius:9px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:inherit;}
+.btn-add:hover{background:#2d4a2d;}
+
+/* FORM */
+.form-box{background:#1e1a14;border:1px solid var(--border);border-radius:14px;padding:1.6rem;margin-bottom:1.5rem;}
+.form-box h3{color:var(--gold-light);margin-bottom:1.2rem;font-size:0.95rem;}
+.form-row{margin-bottom:1rem;}
+.form-row label{display:block;font-size:0.72rem;color:var(--muted);margin-bottom:5px;letter-spacing:0.06em;text-transform:uppercase;}
+.form-row input,.form-row textarea,.form-row select{width:100%;padding:10px 13px;background:var(--dark2);border:1px solid var(--border);border-radius:8px;color:#e8e0d0;font-size:0.9rem;outline:none;font-family:inherit;}
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus{border-color:var(--gold);}
+.form-row textarea{min-height:80px;resize:vertical;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:580px){.form-grid{grid-template-columns:1fr;}}
+.form-actions{display:flex;gap:10px;margin-top:1.2rem;flex-wrap:wrap;}
+.btn-save{background:var(--gold);color:#1e1a14;border:none;padding:10px 22px;border-radius:8px;cursor:pointer;font-size:0.88rem;font-weight:700;font-family:inherit;}
+.btn-save:hover{background:var(--gold-light);}
+.btn-cancel{background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 18px;border-radius:8px;cursor:pointer;font-size:0.88rem;font-family:inherit;}
+.btn-cancel:hover{color:var(--gold-light);}
+
+/* IMAGE UPLOAD */
+.img-upload-area{border:2px dashed var(--border);border-radius:10px;padding:1.2rem;text-align:center;cursor:pointer;transition:border-color 0.2s;position:relative;}
+.img-upload-area:hover{border-color:var(--gold);}
+.img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.img-upload-area p{color:var(--muted);font-size:0.82rem;margin-top:0.3rem;}
+.img-preview{max-width:100%;max-height:160px;border-radius:8px;margin-top:0.8rem;display:none;}
+.or-divider{text-align:center;color:var(--muted);font-size:0.75rem;margin:0.6rem 0;position:relative;}
+.or-divider::before,.or-divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--border);}
+.or-divider::before{left:0;}.or-divider::after{right:0;}
+.upload-progress{background:var(--border);border-radius:4px;height:4px;margin-top:6px;display:none;}
+.upload-progress-bar{height:100%;background:var(--gold);border-radius:4px;width:0%;transition:width 0.3s;}
+
+/* ITEMS LIST */
+.item-list{display:flex;flex-direction:column;gap:8px;}
+.item{background:#1e1a14;border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;display:flex;align-items:center;gap:0.8rem;}
+.item-img{width:48px;height:48px;object-fit:cover;border-radius:8px;background:var(--dark2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+.item-info{flex:1;min-width:0;}
+.item-name{font-size:0.9rem;color:#e8e0d0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-sub{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+.item-actions{display:flex;gap:6px;flex-shrink:0;}
+.btn-edit{background:rgba(184,146,42,0.15);border:1px solid rgba(184,146,42,0.3);color:var(--gold-light);padding:6px 12px;border-radius:7px;cursor:pointer;font-size:0.75rem;font-family:inherit;}
+.btn-edit:hover{background:rgba(184,146,42,0.25);}
+.btn-del{background:rgba(192,57,43,0.12);border:1px solid rgba(192,57,43,0.3);color:#e74c3c;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:0.75rem;font-family:inherit;}
+.btn-del:hover{background:rgba(192,57,43,0.22);}
+.badge-cs{background:rgba(184,146,42,0.2);color:var(--gold-light);font-size:0.65rem;padding:2px 7px;border-radius:8px;margin-left:5px;}
+
+/* SOCIAL GRID */
+.social-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+@media(max-width:580px){.social-grid{grid-template-columns:1fr;}}
+.social-item{background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;display:flex;align-items:center;gap:10px;}
+.social-icon{font-size:1.3rem;flex-shrink:0;}
+.social-item input{flex:1;background:transparent;border:none;color:#e8e0d0;font-size:0.85rem;outline:none;font-family:inherit;}
+.social-item input::placeholder{color:rgba(140,122,96,0.5);}
+.social-item label{font-size:0.68rem;color:var(--muted);display:block;margin-bottom:2px;}
+
+/* CATEGORY GRID */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.6rem;margin-bottom:1rem;}
+.cat-chip{background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.8rem;display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.cat-chip span{font-size:0.82rem;}
+.cat-del{background:none;border:none;color:rgba(192,57,43,0.6);cursor:pointer;font-size:0.9rem;padding:0 2px;}
+.cat-del:hover{color:#e74c3c;}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1e1a14;border:1px solid var(--gold);color:var(--gold-light);padding:11px 18px;border-radius:10px;font-size:0.85rem;opacity:0;transform:translateY(8px);transition:all 0.3s;z-index:999;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.empty{text-align:center;padding:2.5rem;color:var(--muted);font-size:0.88rem;}
+.loading{text-align:center;padding:2rem;color:var(--muted);}
+.section-divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0;}
+.settings-note{font-size:0.75rem;color:var(--muted);margin-top:0.4rem;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">🌙</div>
+    <h1>Admin Panel</h1>
+    <p>Umme Ibrahim Studio</p>
+    <input type="password" id="pwdInput" placeholder="Enter your password" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn-login" onclick="login()">Login →</button>
+    <div class="login-err" id="loginErr">❌ Wrong password. Try again.</div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="adminPage">
+  <div class="admin-header">
+    <div class="admin-header-left">
+      <span>🌙</span>
+      <h1>Umme Ibrahim Studio — Admin</h1>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a href="index.html" target="_blank" class="btn-visit">Visit Website ↗</a>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('products',this)">🛍️ Products</button>
+    <button class="tab" onclick="showTab('blogs',this)">📖 Blog</button>
+    <button class="tab" onclick="showTab('categories',this)">🗂️ Categories</button>
+    <button class="tab" onclick="showTab('settings',this)">⚙️ Site Settings</button>
+  </div>
+
+  <!-- ══════════ PRODUCTS TAB ══════════ -->
+  <div id="tab-products" class="content">
+    <div class="sec-title">Products <button class="btn-add" onclick="showProductForm()">+ Add Product</button></div>
+
+    <div class="form-box" id="productForm" style="display:none;">
+      <h3 id="pFormTitle">➕ Add New Product</h3>
+      <input type="hidden" id="pId">
+      <div class="form-grid">
+        <div class="form-row"><label>Product Name *</label><input type="text" id="pName" placeholder="e.g. Feelings & Emotions Flash Cards"></div>
+        <div class="form-row"><label>Category *</label><select id="pCategory"></select></div>
+        <div class="form-row"><label>Price (₹) *</label><input type="number" id="pPrice" placeholder="149"></div>
+        <div class="form-row"><label>Mark as Coming Soon?</label>
+          <select id="pComingSoon"><option value="false">No — Available Now</option><option value="true">Yes — Coming Soon</option></select>
+        </div>
+      </div>
+      <div class="form-row"><label>Description</label><textarea id="pDesc" placeholder="Describe the product..."></textarea></div>
+
+      <!-- IMAGE UPLOAD -->
+      <div class="form-row">
+        <label>Product Image</label>
+        <div class="img-upload-area" onclick="document.getElementById('pImgFile').click()">
+          <div style="font-size:2rem;">📷</div>
+          <p>Click to upload image from phone/computer</p>
+          <input type="file" id="pImgFile" accept="image/*" style="display:none" onchange="handleImgSelect(this)">
+        </div>
+        <div class="upload-progress" id="uploadProgress"><div class="upload-progress-bar" id="uploadBar"></div></div>
+        <img id="imgPreview" class="img-preview" alt="Preview">
+        <div class="or-divider">OR</div>
+        <input type="text" id="pImg" placeholder="Paste image URL (e.g. emotions_flashcards.jpg or https://...)">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-save" onclick="saveProduct()">💾 Save Product</button>
+        <button class="btn-cancel" onclick="hideProductForm()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="item-list" id="productList"><div class="loading">Loading... 🌙</div></div>
+  </div>
+
+  <!-- ══════════ BLOG TAB ══════════ -->
+  <div id="tab-blogs" class="content" style="display:none;">
+    <div class="sec-title">Blog Posts <button class="btn-add" onclick="showBlogForm()">+ Add Post</button></div>
+
+    <div class="form-box" id="blogForm" style="display:none;">
+      <h3 id="bFormTitle">➕ Add New Blog Post</h3>
+      <input type="hidden" id="bId">
+      <div class="form-grid">
+        <div class="form-row"><label>Title *</label><input type="text" id="bTitle" placeholder="e.g. 10 Screen-Free Activities for Muslim Toddlers"></div>
+        <div class="form-row"><label>Tag / Category</label><input type="text" id="bTag" placeholder="Islamic Parenting"></div>
+        <div class="form-row"><label>Date</label><input type="text" id="bDate" placeholder="May 2026"></div>
+      </div>
+      <div class="form-row"><label>Short Excerpt (shown on blog listing page)</label><textarea id="bExcerpt" placeholder="A short summary..."></textarea></div>
+      
+      <!-- HTML FILE UPLOAD -->
+      <div class="form-row">
+        <label>Upload HTML Blog File (optional — for full designed article)</label>
+        <div class="img-upload-area" id="htmlUploadArea">
+          <div style="font-size:2rem;">📄</div>
+          <p id="htmlUploadText">Click to upload your .html blog file</p>
+          <input type="file" id="bHtmlFile" accept=".html,.htm" style="display:none" onchange="handleHtmlUpload(this)">
+        </div>
+        <p class="settings-note">Upload the full HTML file of your blog post — it will open when readers click "Read"</p>
+      </div>
+      <input type="hidden" id="bHtmlUrl">
+
+      <div class="form-actions">
+        <button class="btn-save" onclick="saveBlog()">💾 Save Post</button>
+        <button class="btn-cancel" onclick="hideBlogForm()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="item-list" id="blogList"><div class="loading">Loading... 🌙</div></div>
+  </div>
+
+  <!-- ══════════ CATEGORIES TAB ══════════ -->
+  <div id="tab-categories" class="content" style="display:none;">
+    <div class="sec-title">Product Categories</div>
+
+    <div class="form-box">
+      <h3>➕ Add New Category</h3>
+      <div class="form-grid">
+        <div class="form-row"><label>Category Name *</label><input type="text" id="catName" placeholder="e.g. Puzzles"></div>
+        <div class="form-row">
+          <label>Choose Icon</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;" id="iconPicker">
+          </div>
+          <input type="hidden" id="catIcon" value="📦">
+          <div style="margin-top:8px;font-size:0.8rem;color:var(--muted);">Selected: <span id="selectedIconDisplay" style="font-size:1.2rem;">📦</span></div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="addCategory()">+ Add Category</button>
+      </div>
+    </div>
+
+    <div class="sec-title" style="font-size:0.9rem;color:var(--muted);">Existing Categories</div>
+    <div class="cat-grid" id="catGrid"><div class="loading">Loading...</div></div>
+  </div>
+
+  <!-- ══════════ SETTINGS TAB ══════════ -->
+  <div id="tab-settings" class="content" style="display:none;">
+    <div class="sec-title">⚙️ Site Settings</div>
+
+    <!-- SOCIAL LINKS -->
+    <div class="form-box">
+      <h3>📱 Social Media & Contact Links</h3>
+      <p class="settings-note" style="margin-bottom:1rem;">Add your handles/usernames. Leave blank to hide from website.</p>
+      <div class="social-grid" id="socialGrid">
+        <!-- Filled by JS -->
+      </div>
+      <div class="form-actions" style="margin-top:1.2rem;">
+        <button class="btn-save" onclick="saveSocialLinks()">💾 Save Social Links</button>
+      </div>
+    </div>
+
+    <!-- WEBSITE TEXT -->
+    <div class="form-box">
+      <h3>✏️ Website Text & Taglines</h3>
+      <div class="form-row"><label>Studio Tagline (shown in header & footer)</label><input type="text" id="sTagline" placeholder="Raising a Screen-Free Little Ummah"></div>
+      <div class="form-row"><label>Hero Title (big text on home page)</label><input type="text" id="sHeroTitle" placeholder="Nurturing Little Muslim Hearts..."></div>
+      <div class="form-row"><label>Hero Subtitle (small text under title)</label><textarea id="sHeroSub" placeholder="Handcrafted Islamic books..."></textarea></div>
+      <div class="form-row"><label>Delivery Note (shown on home page)</label><input type="text" id="sDelivery" placeholder="All India Delivery Available"></div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="saveTextSettings()">💾 Save Text</button>
+      </div>
+    </div>
+
+    <!-- PASSWORD CHANGE -->
+    <div class="form-box">
+      <h3>🔐 Change Admin Password</h3>
+      <div class="form-row"><label>New Password</label><input type="password" id="newPwd" placeholder="Enter new password"></div>
+      <div class="form-row"><label>Confirm Password</label><input type="password" id="confirmPwd" placeholder="Confirm new password"></div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="changePassword()">🔐 Change Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="supabase.js"></script>
+<script>
+// ─── LOGIN ───
+async function login() {
+  const pwd = document.getElementById('pwdInput').value.trim();
+  try {
+    const res = await sbFetch('admin?select=password&id=eq.1');
+    const correct = res.length ? res[0].password : 'ummeibrahim2024';
+    if (pwd === correct) {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('adminPage').style.display = 'block';
+      initAdmin();
+    } else {
+      document.getElementById('loginErr').style.display = 'block';
+    }
+  } catch(e) {
+    if (pwd === 'ummeibrahim2024') {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('adminPage').style.display = 'block';
+      initAdmin();
+    } else {
+      document.getElementById('loginErr').style.display = 'block';
+    }
+  }
+}
+function logout() {
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('adminPage').style.display = 'none';
+  document.getElementById('pwdInput').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+}
+function initAdmin() { loadProducts(); loadCategories(); }
+
+// ─── TABS ───
+function showTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['products','blogs','categories','settings'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t === name ? 'block' : 'none';
+  });
+  if (name === 'blogs') loadBlogs();
+  if (name === 'categories') loadCategories();
+  if (name === 'settings') loadSettings();
+}
+
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── IMAGE UPLOAD ───
+let uploadedImageUrl = '';
+async function handleImgSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const preview = document.getElementById('imgPreview');
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = 'block';
+  document.getElementById('uploadProgress').style.display = 'block';
+  document.getElementById('uploadBar').style.width = '30%';
+  try {
+    const url = await uploadImage(file);
+    uploadedImageUrl = url;
+    document.getElementById('pImg').value = url;
+    document.getElementById('uploadBar').style.width = '100%';
+    showToast('✅ Image uploaded!');
+    setTimeout(() => { document.getElementById('uploadProgress').style.display = 'none'; }, 1000);
+  } catch(e) {
+    showToast('❌ Upload failed. Use URL instead.');
+    document.getElementById('uploadProgress').style.display = 'none';
+  }
+}
+
+// ─── HTML FILE UPLOAD ───
+async function handleHtmlUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('htmlUploadText').textContent = '⏳ Uploading...';
+  try {
+    const fileName = `blog_${Date.now()}.html`;
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/blog-files/${fileName}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'text/html',
+        'x-upsert': 'true'
+      },
+      body: file
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    const url = `${SUPABASE_URL}/storage/v1/object/public/blog-files/${fileName}`;
+    document.getElementById('bHtmlUrl').value = url;
+    document.getElementById('htmlUploadText').textContent = '✅ ' + file.name + ' uploaded!';
+    showToast('✅ Blog file uploaded!');
+  } catch(e) {
+    document.getElementById('htmlUploadText').textContent = '❌ Upload failed. Try again.';
+    showToast('❌ HTML upload failed.');
+  }
+}
+
+// ─── CATEGORIES ───
+const ICON_LIST = ['📚','🃏','📜','📓','🎨','🖼️','⭐','🎁','🧩','🪆','🎭','🌙','🕌','📿','🌿','🤲','🌟','💛','🐣','🦋','🎯','📌','🗺️','🧸','🪀','🎪','📦'];
+
+function buildIconPicker() {
+  const el = document.getElementById('iconPicker');
+  el.innerHTML = ICON_LIST.map(ic => `<span style="font-size:1.5rem;cursor:pointer;padding:4px 6px;border-radius:6px;border:1px solid transparent;" onclick="selectIcon('${ic}')" title="${ic}">${ic}</span>`).join('');
+}
+
+function selectIcon(ic) {
+  document.getElementById('catIcon').value = ic;
+  document.getElementById('selectedIconDisplay').textContent = ic;
+  document.querySelectorAll('#iconPicker span').forEach(s => {
+    s.style.borderColor = s.textContent === ic ? 'var(--gold)' : 'transparent';
+    s.style.background = s.textContent === ic ? 'rgba(184,146,42,0.15)' : 'transparent';
+  });
+}
+
+let allCategories = [];
+async function loadCategories() {
+  buildIconPicker();
+  try {
+    allCategories = await getCategories();
+    const el = document.getElementById('catGrid');
+    if (!allCategories.length) { el.innerHTML = '<div class="empty">No categories yet.</div>'; return; }
+    el.innerHTML = allCategories.map(c => `<div class="cat-chip"><span>${c.icon} ${c.name}</span><button class="cat-del" onclick="deleteCategory('${c.id}','${c.name}')">✕</button></div>`).join('');
+    // Also update product category dropdown
+    const sel = document.getElementById('pCategory');
+    if (sel) {
+      sel.innerHTML = allCategories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join('');
+    }
+  } catch(e) { document.getElementById('catGrid').innerHTML = '<div class="empty">Could not load.</div>'; }
+}
+
+async function addCategory() {
+  const name = document.getElementById('catName').value.trim();
+  const icon = document.getElementById('catIcon').value;
+  if (!name) { alert('Please enter category name!'); return; }
+  try {
+    await sbFetch('categories', { method: 'POST', body: JSON.stringify({ name, icon, sort_order: allCategories.length + 1 }) });
+    document.getElementById('catName').value = '';
+    showToast('✅ Category added!');
+    loadCategories();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteCategory(id, name) {
+  if (!confirm(`Delete category "${name}"?`)) return;
+  try {
+    await sbFetch(`categories?id=eq.${id}`, { method: 'DELETE' });
+    showToast('🗑️ Category deleted');
+    loadCategories();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ─── PRODUCTS ───
+function showProductForm(p) {
+  loadCategories();
+  document.getElementById('productForm').style.display = 'block';
+  uploadedImageUrl = '';
+  document.getElementById('imgPreview').style.display = 'none';
+  if (p) {
+    document.getElementById('pFormTitle').textContent = '✏️ Edit Product';
+    document.getElementById('pId').value = p.id;
+    document.getElementById('pName').value = p.name || '';
+    document.getElementById('pPrice').value = p.price || '';
+    document.getElementById('pDesc').value = p.description || '';
+    document.getElementById('pImg').value = p.image_url || '';
+    document.getElementById('pComingSoon').value = p.is_coming_soon ? 'true' : 'false';
+    if (p.image_url) { document.getElementById('imgPreview').src = p.image_url; document.getElementById('imgPreview').style.display = 'block'; }
+    setTimeout(() => { if (p.category) document.getElementById('pCategory').value = p.category; }, 300);
+  } else {
+    document.getElementById('pFormTitle').textContent = '➕ Add New Product';
+    document.getElementById('pId').value = '';
+    document.getElementById('pName').value = '';
+    document.getElementById('pPrice').value = '';
+    document.getElementById('pDesc').value = '';
+    document.getElementById('pImg').value = '';
+    document.getElementById('pComingSoon').value = 'false';
+  }
+  document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
+}
+function hideProductForm() { document.getElementById('productForm').style.display = 'none'; }
+
+async function saveProduct() {
+  const id = document.getElementById('pId').value;
+  const imgVal = document.getElementById('pImg').value.trim() || uploadedImageUrl;
+  const data = {
+    name: document.getElementById('pName').value.trim(),
+    category: document.getElementById('pCategory').value,
+    price: parseInt(document.getElementById('pPrice').value) || 0,
+    description: document.getElementById('pDesc').value.trim(),
+    image_url: imgVal,
+    is_coming_soon: document.getElementById('pComingSoon').value === 'true'
+  };
+  if (!data.name) { alert('Please enter product name!'); return; }
+  try {
+    if (id) {
+      await sbFetch(`products?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+      showToast('✅ Product updated!');
+    } else {
+      await sbFetch('products', { method: 'POST', body: JSON.stringify(data) });
+      showToast('✅ Product added!');
+    }
+    hideProductForm();
+    loadProducts();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteProduct(id, name) {
+  if (!confirm(`Delete "${name}"?`)) return;
+  try {
+    await sbFetch(`products?id=eq.${id}`, { method: 'DELETE' });
+    showToast('🗑️ Deleted');
+    loadProducts();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function loadProducts() {
+  try {
+    const list = await getProducts();
+    const el = document.getElementById('productList');
+    if (!list.length) { el.innerHTML = '<div class="empty">No products yet. Add your first! 🌙</div>'; return; }
+    el.innerHTML = list.map(p => `
+      <div class="item">
+        ${p.image_url ? `<img class="item-img" src="${p.image_url}" onerror="this.style.opacity=0.2">` : `<div class="item-img">🌙</div>`}
+        <div class="item-info">
+          <div class="item-name">${p.name}${p.is_coming_soon ? '<span class="badge-cs">Soon</span>' : ''}</div>
+          <div class="item-sub">${p.category || ''} · ₹${p.price}</div>
+        </div>
+        <div class="item-actions">
+          <button class="btn-edit" onclick='editProduct(${JSON.stringify(p).replace(/\\/g,"\\\\").replace(/'/g,"\\'")})'>Edit</button>
+          <button class="btn-del" onclick="deleteProduct('${p.id}','${(p.name||'').replace(/'/g,"\\'")}')">Del</button>
+        </div>
+      </div>`).join('');
+  } catch(e) { document.getElementById('productList').innerHTML = '<div class="empty">Could not load.</div>'; }
+}
+function editProduct(p) { showProductForm(p); }
+
+// ─── BLOGS ───
+function showBlogForm(b) {
+  document.getElementById('blogForm').style.display = 'block';
+  document.getElementById('htmlUploadText').textContent = 'Click to upload your .html blog file';
+  document.getElementById('bHtmlUrl').value = '';
+  if (b) {
+    document.getElementById('bFormTitle').textContent = '✏️ Edit Post';
+    document.getElementById('bId').value = b.id;
+    document.getElementById('bTitle').value = b.title || '';
+    document.getElementById('bTag').value = b.tag || '';
+    document.getElementById('bDate').value = b.date || '';
+    document.getElementById('bExcerpt').value = b.excerpt || '';
+    document.getElementById('bHtmlUrl').value = b.html_url || '';
+    if (b.html_url) document.getElementById('htmlUploadText').textContent = '✅ File already uploaded';
+  } else {
+    document.getElementById('bFormTitle').textContent = '➕ Add New Post';
+    ['bId','bTitle','bTag','bDate','bExcerpt'].forEach(id => document.getElementById(id).value = '');
+  }
+  document.getElementById('blogForm').scrollIntoView({ behavior: 'smooth' });
+}
+function hideBlogForm() { document.getElementById('blogForm').style.display = 'none'; }
+
+async function saveBlog() {
+  const id = document.getElementById('bId').value;
+  const data = {
+    title: document.getElementById('bTitle').value.trim(),
+    tag: document.getElementById('bTag').value.trim(),
+    date: document.getElementById('bDate').value.trim(),
+    excerpt: document.getElementById('bExcerpt').value.trim(),
+    html_url: document.getElementById('bHtmlUrl').value.trim()
+  };
+  if (!data.title) { alert('Please enter blog title!'); return; }
+  try {
+    if (id) {
+      await sbFetch(`blogs?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+      showToast('✅ Post updated!');
+    } else {
+      await sbFetch('blogs', { method: 'POST', body: JSON.stringify(data) });
+      showToast('✅ Post added!');
+    }
+    hideBlogForm();
+    loadBlogs();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteBlog(id, title) {
+  if (!confirm(`Delete "${title}"?`)) return;
+  try {
+    await sbFetch(`blogs?id=eq.${id}`, { method: 'DELETE' });
+    showToast('🗑️ Deleted');
+    loadBlogs();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function loadBlogs() {
+  try {
+    const list = await getBlogs();
+    const el = document.getElementById('blogList');
+    if (!list.length) { el.innerHTML = '<div class="empty">No posts yet. Add your first! ✍️</div>'; return; }
+    el.innerHTML = list.map(b => `
+      <div class="item">
+        <div class="item-img">📖</div>
+        <div class="item-info">
+          <div class="item-name">${b.title}</div>
+          <div class="item-sub">${b.tag || 'Blog'} · ${b.date || ''}</div>
+        </div>
+        <div class="item-actions">
+          <button class="btn-edit" onclick='editBlog(${JSON.stringify(b).replace(/\\/g,"\\\\").replace(/'/g,"\\'")})'>Edit</button>
+          <button class="btn-del" onclick="deleteBlog('${b.id}','${(b.title||'').replace(/'/g,"\\'")}')">Del</button>
+        </div>
+      </div>`).join('');
+  } catch(e) { document.getElementById('blogList').innerHTML = '<div class="empty">Could not load.</div>'; }
+}
+function editBlog(b) { showBlogForm(b); }
+
+// ─── SETTINGS ───
+const SOCIALS = [
+  { key: 'whatsapp', icon: '💬', label: 'WhatsApp', placeholder: '+918444968880' },
+  { key: 'instagram', icon: '📸', label: 'Instagram', placeholder: 'ummeibrahim.studio' },
+  { key: 'substack', icon: '📬', label: 'Substack', placeholder: 'yourname.substack.com' },
+  { key: 'beacons', icon: '🔗', label: 'Beacons / Link in Bio', placeholder: 'beacons.ai/yourname' },
+  { key: 'x_twitter', icon: '𝕏', label: 'X / Twitter', placeholder: '@yourhandle' },
+  { key: 'threads', icon: '🧵', label: 'Threads', placeholder: '@yourhandle' },
+  { key: 'facebook', icon: '📘', label: 'Facebook', placeholder: 'facebook.com/yourpage' },
+  { key: 'youtube', icon: '▶️', label: 'YouTube', placeholder: 'youtube.com/@yourchannel' },
+];
+
+async function loadSettings() {
+  try {
+    const s = await getSettings();
+    // Render social grid
+    document.getElementById('socialGrid').innerHTML = SOCIALS.map(so => `
+      <div class="social-item">
+        <span class="social-icon">${so.icon}</span>
+        <div style="flex:1;">
+          <label>${so.label}</label>
+          <input type="text" id="s_${so.key}" placeholder="${so.placeholder}" value="${s[so.key] || ''}">
+        </div>
+      </div>`).join('');
+    // Text settings
+    document.getElementById('sTagline').value = s.tagline || '';
+    document.getElementById('sHeroTitle').value = s.hero_title || '';
+    document.getElementById('sHeroSub').value = s.hero_subtitle || '';
+    document.getElementById('sDelivery').value = s.delivery_note || '';
+  } catch(e) { showToast('Could not load settings.'); }
+}
+
+async function saveSocialLinks() {
+  try {
+    for (const so of SOCIALS) {
+      const val = document.getElementById('s_'+so.key).value.trim();
+      await saveSetting(so.key, val);
+    }
+    showToast('✅ Social links saved!');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function saveTextSettings() {
+  try {
+    await saveSetting('tagline', document.getElementById('sTagline').value.trim());
+    await saveSetting('hero_title', document.getElementById('sHeroTitle').value.trim());
+    await saveSetting('hero_subtitle', document.getElementById('sHeroSub').value.trim());
+    await saveSetting('delivery_note', document.getElementById('sDelivery').value.trim());
+    showToast('✅ Text settings saved!');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function changePassword() {
+  const np = document.getElementById('newPwd').value.trim();
+  const cp = document.getElementById('confirmPwd').value.trim();
+  if (!np) { alert('Enter new password!'); return; }
+  if (np !== cp) { alert('Passwords do not match!'); return; }
+  try {
+    await sbFetch('admin?id=eq.1', { method: 'PATCH', body: JSON.stringify({ password: np }) });
+    showToast('✅ Password changed!');
+    document.getElementById('newPwd').value = '';
+    document.getElementById('confirmPwd').value = '';
+  } catch(e) { alert('Error: ' + e.message); }
+}
+</script>
+</body>
+</html>
