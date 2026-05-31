@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Umme Ibrahim Studio</title>
+<style>
+:root{--gold:#B8922A;--gold-light:#D4AE5A;--dark:#1E1A14;--dark2:#2a2318;--green:#3A5C3A;--muted:#8C7A60;--border:rgba(184,146,42,0.2);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:system-ui,sans-serif;background:#0f0d0a;color:#e8e0d0;min-height:100vh;}
+#loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.login-box{background:#1e1a14;border:1px solid var(--border);border-radius:20px;padding:2.8rem;width:90%;max-width:380px;text-align:center;}
+.login-box h1{font-size:1.5rem;color:var(--gold-light);margin-bottom:0.3rem;}
+.login-box p{color:var(--muted);font-size:0.82rem;margin-bottom:2rem;}
+.login-box input{width:100%;padding:13px 16px;background:var(--dark2);border:1px solid var(--border);border-radius:10px;color:#e8e0d0;font-size:0.95rem;margin-bottom:1rem;outline:none;font-family:inherit;}
+.login-box input:focus{border-color:var(--gold);}
+.btn-login{width:100%;padding:13px;background:var(--gold);color:#1e1a14;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit;}
+.login-err{color:#e74c3c;font-size:0.82rem;margin-top:0.5rem;display:none;}
+#adminPage{display:none;}
+.admin-header{background:#1e1a14;border-bottom:2px solid var(--gold);padding:0 1.5rem;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.admin-header h1{color:var(--gold-light);font-size:1rem;font-weight:600;}
+.btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:0.8rem;font-family:inherit;}
+.btn-visit{background:var(--green);color:white;border:none;padding:6px 14px;border-radius:8px;font-size:0.8rem;text-decoration:none;font-weight:600;}
+.tabs{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);padding:0 1.5rem;background:#1a1610;}
+.tab{padding:13px 16px;cursor:pointer;font-size:0.82rem;white-space:nowrap;color:var(--muted);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;transition:all 0.2s;}
+.tab.active,.tab:hover{color:var(--gold-light);border-bottom-color:var(--gold);}
+.content{padding:1.5rem;max-width:860px;margin:0 auto;}
+.sec-title{font-size:1.1rem;color:var(--gold-light);margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.btn-add{background:var(--green);color:white;border:none;padding:9px 18px;border-radius:9px;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:inherit;}
+.form-box{background:#1e1a14;border:1px solid var(--border);border-radius:14px;padding:1.6rem;margin-bottom:1.5rem;}
+.form-box h3{color:var(--gold-light);margin-bottom:1.2rem;font-size:0.95rem;}
+.form-row{margin-bottom:1rem;}
+.form-row label{display:block;font-size:0.72rem;color:var(--muted);margin-bottom:5px;letter-spacing:0.06em;text-transform:uppercase;}
+.form-row input,.form-row textarea,.form-row select{width:100%;padding:10px 13px;background:var(--dark2);border:1px solid var(--border);border-radius:8px;color:#e8e0d0;font-size:0.9rem;outline:none;font-family:inherit;}
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus{border-color:var(--gold);}
+.form-row textarea{min-height:80px;resize:vertical;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:580px){.form-grid{grid-template-columns:1fr;}}
+.form-actions{display:flex;gap:10px;margin-top:1.2rem;flex-wrap:wrap;}
+.btn-save{background:var(--gold);color:#1e1a14;border:none;padding:10px 22px;border-radius:8px;cursor:pointer;font-size:0.88rem;font-weight:700;font-family:inherit;}
+.btn-cancel{background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 18px;border-radius:8px;cursor:pointer;font-size:0.88rem;font-family:inherit;}
+.upload-area{border:2px dashed var(--border);border-radius:10px;padding:1.2rem;text-align:center;cursor:pointer;background:var(--dark2);transition:border-color 0.2s;position:relative;}
+.upload-area:hover{border-color:var(--gold);}
+.upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-area p{color:var(--muted);font-size:0.82rem;margin-top:0.3rem;}
+.upload-area.done{border-color:var(--green);background:rgba(58,92,58,0.1);}
+.upload-area.done p{color:#6dbf6d;}
+.img-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.img-thumb{position:relative;width:76px;height:76px;}
+.img-thumb img{width:100%;height:100%;object-fit:cover;border-radius:8px;border:1px solid var(--border);}
+.img-thumb button{position:absolute;top:-5px;right:-5px;background:#c0392b;color:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;line-height:1;}
+.or-line{text-align:center;color:var(--muted);font-size:0.75rem;margin:0.5rem 0;}
+.progress{height:4px;background:var(--border);border-radius:4px;margin-top:5px;display:none;}
+.progress-fill{height:100%;background:var(--gold);border-radius:4px;transition:width 0.3s;}
+.note{font-size:0.72rem;color:var(--muted);margin-top:4px;}
+.item-list{display:flex;flex-direction:column;gap:8px;}
+.item{background:#1e1a14;border:1px solid var(--border);border-radius:12px;padding:0.9rem 1.2rem;display:flex;align-items:center;gap:0.8rem;}
+.item-img{width:48px;height:48px;object-fit:cover;border-radius:8px;background:var(--dark2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+.item-info{flex:1;min-width:0;}
+.item-name{font-size:0.9rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-sub{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+.item-actions{display:flex;gap:6px;flex-shrink:0;}
+.btn-edit{background:rgba(184,146,42,0.15);border:1px solid rgba(184,146,42,0.3);color:var(--gold-light);padding:6px 11px;border-radius:7px;cursor:pointer;font-size:0.75rem;font-family:inherit;}
+.btn-del{background:rgba(192,57,43,0.12);border:1px solid rgba(192,57,43,0.3);color:#e74c3c;padding:6px 11px;border-radius:7px;cursor:pointer;font-size:0.75rem;font-family:inherit;}
+.badge-cs{background:rgba(184,146,42,0.2);color:var(--gold-light);font-size:0.65rem;padding:2px 7px;border-radius:8px;margin-left:5px;}
+.social-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+@media(max-width:580px){.social-grid{grid-template-columns:1fr;}}
+.social-item{background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;display:flex;align-items:center;gap:10px;}
+.social-icon{font-size:1.3rem;flex-shrink:0;}
+.social-item label{font-size:0.68rem;color:var(--muted);display:block;margin-bottom:3px;}
+.social-item input{width:100%;background:transparent;border:none;color:#e8e0d0;font-size:0.85rem;outline:none;font-family:inherit;}
+.cat-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;}
+.cat-chip{background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:7px 12px;display:flex;align-items:center;gap:6px;font-size:0.82rem;}
+.cat-del{background:none;border:none;color:rgba(192,57,43,0.6);cursor:pointer;font-size:0.85rem;padding:0 2px;}
+.icon-picker{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.icon-opt{font-size:1.4rem;cursor:pointer;padding:4px 6px;border-radius:6px;border:1.5px solid transparent;}
+.icon-opt:hover,.icon-opt.sel{border-color:var(--gold);background:rgba(184,146,42,0.15);}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1e1a14;border:1px solid var(--gold);color:var(--gold-light);padding:11px 18px;border-radius:10px;font-size:0.85rem;opacity:0;transform:translateY(8px);transition:all 0.3s;z-index:999;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.empty{text-align:center;padding:2.5rem;color:var(--muted);font-size:0.88rem;}
+</style>
+</head>
+<body>
+
+<div id="loginPage">
+  <div class="login-box">
+    <div style="font-size:3rem;margin-bottom:1rem;">🌙</div>
+    <h1>Admin Panel</h1>
+    <p>Umme Ibrahim Studio</p>
+    <input type="password" id="pwdInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn-login" onclick="login()">Login →</button>
+    <div class="login-err" id="loginErr">❌ Wrong password.</div>
+  </div>
+</div>
+
+<div id="adminPage">
+  <div class="admin-header">
+    <div style="display:flex;align-items:center;gap:10px;"><span>🌙</span><h1>Umme Ibrahim Studio — Admin</h1></div>
+    <div style="display:flex;gap:8px;">
+      <a href="index.html" target="_blank" class="btn-visit">Visit Site ↗</a>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('products',this)">🛍️ Products</button>
+    <button class="tab" onclick="showTab('blogs',this)">📖 Blog</button>
+    <button class="tab" onclick="showTab('categories',this)">🗂️ Categories</button>
+    <button class="tab" onclick="showTab('settings',this)">⚙️ Settings</button>
+    <button class="tab" onclick="showTab('leads',this)">👥 Leads</button>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div id="tab-products" class="content">
+    <div class="sec-title">Products <button class="btn-add" onclick="showPForm()">+ Add Product</button></div>
+    <div class="form-box" id="pForm" style="display:none;">
+      <h3 id="pFormTitle">➕ New Product</h3>
+      <input type="hidden" id="pId">
+      <div class="form-grid">
+        <div class="form-row"><label>Name *</label><input type="text" id="pName" placeholder="Product name"></div>
+        <div class="form-row"><label>Category *</label><select id="pCat"></select></div>
+        <div class="form-row"><label>Price ₹ *</label><input type="number" id="pPrice" placeholder="149"></div>
+        <div class="form-row"><label>Status</label>
+          <select id="pSoon"><option value="false">✅ Available</option><option value="true">🕐 Coming Soon</option></select>
+        </div>
+      </div>
+      <div class="form-row"><label>Description</label><textarea id="pDesc" placeholder="Describe the product..."></textarea></div>
+      <div class="form-row">
+        <label>Images (up to 3 — shown as slider)</label>
+        <div class="upload-area" id="pImgArea" onclick="document.getElementById('pImgFile').click()">
+          <div style="font-size:2rem;">🖼️</div>
+          <p id="pImgTxt">Click to upload image(s)</p>
+          <input type="file" id="pImgFile" accept="image/*" multiple>
+        </div>
+        <div class="progress" id="pImgProg"><div class="progress-fill" id="pImgProgFill" style="width:0%"></div></div>
+        <div class="img-previews" id="pImgPreviews"></div>
+        <div class="or-line">— OR paste URL below —</div>
+        <input type="text" id="pImgUrl" placeholder="image.jpg or https://... (separate multiple with comma)">
+        <p class="note">Multiple images: img1.jpg, img2.jpg, img3.jpg</p>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="saveProduct()">💾 Save</button>
+        <button class="btn-cancel" onclick="hidePForm()">Cancel</button>
+      </div>
+    </div>
+    <div class="item-list" id="pList"><div class="empty">Loading... 🌙</div></div>
+  </div>
+
+  <!-- BLOGS -->
+  <div id="tab-blogs" class="content" style="display:none;">
+    <div class="sec-title">Blog Posts <button class="btn-add" onclick="showBForm()">+ Add Post</button></div>
+    <div class="form-box" id="bForm" style="display:none;">
+      <h3 id="bFormTitle">➕ New Blog Post</h3>
+      <input type="hidden" id="bId">
+      <div class="form-grid">
+        <div class="form-row"><label>Title *</label><input type="text" id="bTitle" placeholder="Blog post title"></div>
+        <div class="form-row"><label>Tag</label><input type="text" id="bTag" placeholder="Islamic Parenting"></div>
+        <div class="form-row"><label>Date</label><input type="text" id="bDate" placeholder="May 2026"></div>
+      </div>
+      <div class="form-row"><label>Short Excerpt</label><textarea id="bExcerpt" placeholder="Short summary shown on blog page..."></textarea></div>
+      <div class="form-row">
+        <label>Thumbnail Image</label>
+        <div class="upload-area" id="bThumbArea" onclick="document.getElementById('bThumbFile').click()">
+          <div style="font-size:1.8rem;">🖼️</div>
+          <p id="bThumbTxt">Click to upload thumbnail</p>
+          <input type="file" id="bThumbFile" accept="image/*">
+        </div>
+        <div class="progress" id="bThumbProg"><div class="progress-fill" id="bThumbProgFill" style="width:0%"></div></div>
+        <img id="bThumbPreview" style="max-height:100px;border-radius:8px;margin-top:6px;display:none;">
+        <div class="or-line">— OR paste URL —</div>
+        <input type="text" id="bThumbUrl" placeholder="Thumbnail image URL">
+      </div>
+      <div class="form-row">
+        <label>Blog HTML File (full article)</label>
+        <div class="upload-area" id="bHtmlArea" onclick="document.getElementById('bHtmlFile').click()">
+          <div style="font-size:1.8rem;">📄</div>
+          <p id="bHtmlTxt">Click to select .html file</p>
+          <input type="file" id="bHtmlFile" accept=".html,.htm">
+        </div>
+        <p class="note">Select your HTML file — content saved to database, renders perfectly on website</p>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="saveBlog()">💾 Save Post</button>
+        <button class="btn-cancel" onclick="hideBForm()">Cancel</button>
+      </div>
+    </div>
+    <div class="item-list" id="bList"><div class="empty">Loading... 🌙</div></div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div id="tab-categories" class="content" style="display:none;">
+    <div class="sec-title">Categories</div>
+    <div class="form-box">
+      <h3>➕ Add Category</h3>
+      <div class="form-grid">
+        <div class="form-row"><label>Name *</label><input type="text" id="catName" placeholder="e.g. Puzzles"></div>
+        <div class="form-row">
+          <label>Icon</label>
+          <div class="icon-picker" id="iconPicker"></div>
+          <input type="hidden" id="catIcon" value="📦">
+          <div style="margin-top:6px;font-size:0.8rem;color:var(--muted);">Selected: <span id="selIcon" style="font-size:1.2rem;">📦</span></div>
+        </div>
+      </div>
+      <div class="form-actions"><button class="btn-save" onclick="addCat()">+ Add</button></div>
+    </div>
+    <div class="cat-grid" id="catGrid"><div class="empty">Loading...</div></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="tab-settings" class="content" style="display:none;">
+    <div class="form-box">
+      <h3>📱 Social & Contact Links</h3>
+      <p class="note" style="margin-bottom:1rem;">Leave blank to hide from website.</p>
+      <div class="social-grid" id="socialGrid"></div>
+      <div class="form-actions"><button class="btn-save" onclick="saveSocials()">💾 Save</button></div>
+    </div>
+    <div class="form-box">
+      <h3>✏️ Website Text</h3>
+      <div class="form-row"><label>Tagline</label><input type="text" id="sTag"></div>
+      <div class="form-row"><label>Hero Title</label><input type="text" id="sHero"></div>
+      <div class="form-row"><label>Hero Subtitle</label><textarea id="sHeroSub"></textarea></div>
+      <div class="form-row"><label>Delivery Note</label><input type="text" id="sDel"></div>
+      <div class="form-actions"><button class="btn-save" onclick="saveText()">💾 Save</button></div>
+    </div>
+    <div class="form-box">
+      <h3>🔐 Change Password</h3>
+      <div class="form-row"><label>New Password</label><input type="password" id="np1"></div>
+      <div class="form-row"><label>Confirm</label><input type="password" id="np2"></div>
+      <div class="form-actions"><button class="btn-save" onclick="changePwd()">Change</button></div>
+    </div>
+  </div>
+  <!-- LEADS -->
+  <div id="tab-leads" class="content" style="display:none;">
+    <div class="sec-title">
+      👥 Visitor Leads
+      <button class="btn-add" onclick="exportLeads()" style="background:#B8922A;">⬇️ Export CSV</button>
+    </div>
+    <div style="background:#1e1a14;border:1px solid rgba(184,146,42,0.2);border-radius:14px;overflow:hidden;">
+      <table style="width:100%;border-collapse:collapse;" id="leadsTable">
+        <thead>
+          <tr style="border-bottom:1px solid rgba(184,146,42,0.2);">
+            <th style="padding:12px 16px;text-align:left;font-size:0.72rem;color:#8C7A60;letter-spacing:0.08em;text-transform:uppercase;">Name</th>
+            <th style="padding:12px 16px;text-align:left;font-size:0.72rem;color:#8C7A60;letter-spacing:0.08em;text-transform:uppercase;">WhatsApp</th>
+            <th style="padding:12px 16px;text-align:left;font-size:0.72rem;color:#8C7A60;letter-spacing:0.08em;text-transform:uppercase;">Email</th>
+            <th style="padding:12px 16px;text-align:left;font-size:0.72rem;color:#8C7A60;letter-spacing:0.08em;text-transform:uppercase;">Date</th>
+            <th style="padding:12px 16px;text-align:left;font-size:0.72rem;color:#8C7A60;letter-spacing:0.08em;text-transform:uppercase;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="leadsBody"><tr><td colspan="5" style="padding:2rem;text-align:center;color:#8C7A60;">Loading... 🌙</td></tr></tbody>
+      </table>
+    </div>
+    <div id="leadsCount" style="font-size:0.78rem;color:#8C7A60;margin-top:0.8rem;text-align:right;"></div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+
+const SUPABASE_URL='https://sydonidhjvpcjdscdeod.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5ZG9uaWRoanZwY2pkc2NkZW9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMTQxNjAsImV4cCI6MjA5NTY5MDE2MH0.0eVyPQR-CX6LHgOqxBBgh9Rt4wD-P2Deq_jN_ziP1Uc';
+
+async function sbFetch(path,options={}){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
+    ...options,
+    headers:{
+      'apikey':SUPABASE_KEY,
+      'Authorization':'Bearer '+SUPABASE_KEY,
+      'Content-Type':'application/json',
+      'Prefer':'return=representation',
+      ...(options.headers||{})
+    }
+  });
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  const t=await res.text();
+  return t?JSON.parse(t):[];
+}
+
+async function uploadImage(file){
+  const ext=file.name.split('.').pop().toLowerCase();
+  const fileName='img_'+Date.now()+'.'+ext;
+  const mimeMap={html:'text/html',htm:'text/html',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',gif:'image/gif',webp:'image/webp'};
+  const ct=mimeMap[ext]||file.type||'application/octet-stream';
+  const res=await fetch(SUPABASE_URL+'/storage/v1/object/product-images/'+fileName,{
+    method:'POST',
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':ct,'x-upsert':'true'},
+    body:file
+  });
+  if(!res.ok){const e=await res.text();throw new Error('Upload failed: '+e);}
+  return SUPABASE_URL+'/storage/v1/object/public/product-images/'+fileName;
+}
+
+async function getProducts(){return sbFetch('products?order=created_at.asc&select=*');}
+async function getBlogs(){return sbFetch('blogs?order=created_at.desc&select=*');}
+async function getCategories(){return sbFetch('categories?order=sort_order.asc&select=*');}
+async function getSettings(){
+  const rows=await sbFetch('settings?select=*');
+  const obj={};rows.forEach(r=>obj[r.key]=r.value);return obj;
+}
+async function saveSetting(key,value){
+  return sbFetch('settings?key=eq.'+key,{method:'PATCH',body:JSON.stringify({value})});
+}
+
+// ── UTILS ──
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function showTab(n,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');
+  ['products','blogs','categories','settings'].forEach(t=>document.getElementById('tab-'+t).style.display=t===n?'block':'none');
+  if(n==='blogs')loadBlogs();
+  if(n==='categories')loadCats();
+  if(n==='settings')loadSettings();
+  if(n==='leads')loadLeads();
+}
+
+// ── LOGIN ──
+async function login(){
+  const pwd=document.getElementById('pwdInput').value.trim();
+  if(!pwd){return;}
+  try{
+    const res=await fetch('https://sydonidhjvpcjdscdeod.supabase.co/rest/v1/admin?select=password&id=eq.1',{
+      headers:{
+        'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5ZG9uaWRoanZwY2pkc2NkZW9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMTQxNjAsImV4cCI6MjA5NTY5MDE2MH0.0eVyPQR-CX6LHgOqxBBgh9Rt4wD-P2Deq_jN_ziP1Uc',
+        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5ZG9uaWRoanZwY2pkc2NkZW9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMTQxNjAsImV4cCI6MjA5NTY5MDE2MH0.0eVyPQR-CX6LHgOqxBBgh9Rt4wD-P2Deq_jN_ziP1Uc'
+      }
+    });
+    const data=await res.json();
+    const correct=data.length?data[0].password:'ummeibrahim2024';
+    if(pwd===correct){startAdmin();}
+    else{document.getElementById('loginErr').style.display='block';}
+  }catch(e){
+    // fallback
+    if(pwd==='ummeibrahim2024'){startAdmin();}
+    else{document.getElementById('loginErr').style.display='block';}
+  }
+}
+function startAdmin(){
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('adminPage').style.display='block';
+  loadProducts();loadCats();
+}
+function logout(){
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('adminPage').style.display='none';
+  document.getElementById('pwdInput').value='';
+  document.getElementById('loginErr').style.display='none';
+}
+
+// ── IMAGE UPLOAD ──
+let pUploadedUrls=[];
+document.getElementById('pImgFile').onchange=async function(){
+  const files=Array.from(this.files).slice(0,3);
+  if(!files.length)return;
+  document.getElementById('pImgProg').style.display='block';
+  try{
+    for(let i=0;i<files.length;i++){
+      const url=await uploadImage(files[i]);
+      pUploadedUrls.push(url);
+      document.getElementById('pImgProgFill').style.width=((i+1)/files.length*100)+'%';
+    }
+    syncPImgUrl();renderPreviews();
+    toast('✅ '+files.length+' image(s) uploaded!');
+  }catch(e){toast('❌ Upload failed: '+e.message);}
+  setTimeout(()=>document.getElementById('pImgProg').style.display='none',800);
+};
+function syncPImgUrl(){document.getElementById('pImgUrl').value=pUploadedUrls.join(', ');}
+function renderPreviews(){
+  const urls=getUrls();
+  document.getElementById('pImgPreviews').innerHTML=urls.map((u,i)=>`
+    <div class="img-thumb"><img src="${u}" onerror="this.style.opacity=0.3">
+    <button onclick="removeImg(${i})">✕</button></div>`).join('');
+}
+function removeImg(i){const u=getUrls();u.splice(i,1);pUploadedUrls=u;document.getElementById('pImgUrl').value=u.join(', ');renderPreviews();}
+function getUrls(){return document.getElementById('pImgUrl').value.split(',').map(s=>s.trim()).filter(Boolean);}
+
+// ── THUMBNAIL UPLOAD ──
+document.getElementById('bThumbFile').onchange=async function(){
+  const file=this.files[0];if(!file)return;
+  document.getElementById('bThumbProg').style.display='block';
+  document.getElementById('bThumbProgFill').style.width='40%';
+  try{
+    const url=await uploadImage(file);
+    document.getElementById('bThumbUrl').value=url;
+    const prev=document.getElementById('bThumbPreview');
+    prev.src=url;prev.style.display='block';
+    document.getElementById('bThumbProgFill').style.width='100%';
+    document.getElementById('bThumbArea').classList.add('done');
+    document.getElementById('bThumbTxt').textContent='✅ '+file.name;
+    toast('✅ Thumbnail uploaded!');
+  }catch(e){toast('❌ Upload failed: '+e.message);}
+  setTimeout(()=>document.getElementById('bThumbProg').style.display='none',800);
+};
+
+// ── HTML FILE READ ──
+let bHtmlContent='';
+document.getElementById('bHtmlFile').onchange=function(){
+  const file=this.files[0];if(!file)return;
+  const area=document.getElementById('bHtmlArea');
+  const txt=document.getElementById('bHtmlTxt');
+  txt.textContent='⏳ Reading...';
+  const reader=new FileReader();
+  reader.onload=function(e){
+    bHtmlContent=e.target.result;
+    area.classList.add('done');
+    txt.textContent='✅ '+file.name+' ready!';
+    toast('✅ HTML file loaded!');
+  };
+  reader.onerror=function(){txt.textContent='❌ Could not read file.';toast('❌ Error.');};
+  reader.readAsText(file);
+};
+
+// ── PRODUCTS ──
+let allCats=[];
+function showPForm(p){
+  pUploadedUrls=[];
+  document.getElementById('pImgPreviews').innerHTML='';
+  document.getElementById('pForm').style.display='block';
+  if(p){
+    document.getElementById('pFormTitle').textContent='✏️ Edit Product';
+    document.getElementById('pId').value=p.id;
+    document.getElementById('pName').value=p.name||'';
+    document.getElementById('pPrice').value=p.price||'';
+    document.getElementById('pDesc').value=p.description||'';
+    document.getElementById('pImgUrl').value=p.image_url||'';
+    document.getElementById('pSoon').value=p.is_coming_soon?'true':'false';
+    if(p.image_url){pUploadedUrls=getUrls();renderPreviews();}
+    setTimeout(()=>{if(p.category)document.getElementById('pCat').value=p.category;},300);
+  }else{
+    document.getElementById('pFormTitle').textContent='➕ New Product';
+    ['pId','pName','pPrice','pDesc','pImgUrl'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('pSoon').value='false';
+  }
+  document.getElementById('pForm').scrollIntoView({behavior:'smooth'});
+}
+function hidePForm(){document.getElementById('pForm').style.display='none';}
+
+async function saveProduct(){
+  const id=document.getElementById('pId').value;
+  const data={
+    name:document.getElementById('pName').value.trim(),
+    category:document.getElementById('pCat').value,
+    price:parseInt(document.getElementById('pPrice').value)||0,
+    description:document.getElementById('pDesc').value.trim(),
+    image_url:document.getElementById('pImgUrl').value.trim(),
+    is_coming_soon:document.getElementById('pSoon').value==='true'
+  };
+  if(!data.name){alert('Enter product name!');return;}
+  try{
+    if(id)await sbFetch(`products?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(data)});
+    else await sbFetch('products',{method:'POST',body:JSON.stringify(data)});
+    toast(id?'✅ Updated!':'✅ Added!');hidePForm();loadProducts();
+  }catch(e){alert('Error: '+e.message);}
+}
+async function delProduct(id,name){
+  if(!confirm(`Delete "${name}"?`))return;
+  try{await sbFetch(`products?id=eq.${id}`,{method:'DELETE'});toast('🗑️ Deleted');loadProducts();}
+  catch(e){alert('Error: '+e.message);}
+}
+async function loadProducts(){
+  try{
+    const list=await getProducts();
+    const el=document.getElementById('pList');
+    if(!list.length){el.innerHTML='<div class="empty">No products yet! ➕</div>';return;}
+    el.innerHTML=list.map(p=>{
+      const img=p.image_url?p.image_url.split(',')[0].trim():'';
+      return `<div class="item">
+        ${img?`<img class="item-img" src="${img}" onerror="this.style.opacity=0.2">`:`<div class="item-img">🌙</div>`}
+        <div class="item-info">
+          <div class="item-name">${p.name}${p.is_coming_soon?'<span class="badge-cs">Soon</span>':''}</div>
+          <div class="item-sub">${p.category||''} · ₹${p.price}</div>
+        </div>
+        <div class="item-actions">
+          <button class="btn-edit" onclick='showPForm(${JSON.stringify(p).replace(/'/g,"&#39;")})'>Edit</button>
+          <button class="btn-del" onclick="delProduct('${p.id}','${(p.name||'').replace(/'/g,"&#39;")}')">Del</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){document.getElementById('pList').innerHTML='<div class="empty">Could not load.</div>';}
+}
+
+// ── BLOGS ──
+function showBForm(b){
+  bHtmlContent='';
+  document.getElementById('bForm').style.display='block';
+  document.getElementById('bHtmlArea').classList.remove('done');
+  document.getElementById('bHtmlTxt').textContent='Click to select .html file';
+  document.getElementById('bThumbArea').classList.remove('done');
+  document.getElementById('bThumbTxt').textContent='Click to upload thumbnail';
+  document.getElementById('bThumbPreview').style.display='none';
+  if(b){
+    document.getElementById('bFormTitle').textContent='✏️ Edit Post';
+    document.getElementById('bId').value=b.id;
+    document.getElementById('bTitle').value=b.title||'';
+    document.getElementById('bTag').value=b.tag||'';
+    document.getElementById('bDate').value=b.date||'';
+    document.getElementById('bExcerpt').value=b.excerpt||'';
+    document.getElementById('bThumbUrl').value=b.thumbnail_url||'';
+    if(b.thumbnail_url){
+      document.getElementById('bThumbPreview').src=b.thumbnail_url;
+      document.getElementById('bThumbPreview').style.display='block';
+    }
+    if(b.content){
+      document.getElementById('bHtmlArea').classList.add('done');
+      document.getElementById('bHtmlTxt').textContent='✅ Article already saved (re-upload to update)';
+      bHtmlContent=b.content; // keep existing content
+    }
+  }else{
+    document.getElementById('bFormTitle').textContent='➕ New Post';
+    ['bId','bTitle','bTag','bDate','bExcerpt','bThumbUrl'].forEach(id=>document.getElementById(id).value='');
+  }
+  document.getElementById('bForm').scrollIntoView({behavior:'smooth'});
+}
+function hideBForm(){document.getElementById('bForm').style.display='none';bHtmlContent='';}
+
+async function saveBlog(){
+  const id=document.getElementById('bId').value;
+  const data={
+    title:document.getElementById('bTitle').value.trim(),
+    tag:document.getElementById('bTag').value.trim(),
+    date:document.getElementById('bDate').value.trim(),
+    excerpt:document.getElementById('bExcerpt').value.trim(),
+    thumbnail_url:document.getElementById('bThumbUrl').value.trim(),
+    content: bHtmlContent || null
+  };
+  if(!data.title){alert('Enter title!');return;}
+  try{
+    if(id)await sbFetch(`blogs?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(data)});
+    else await sbFetch('blogs',{method:'POST',body:JSON.stringify(data)});
+    toast(id?'✅ Post updated!':'✅ Post added!');
+    hideBForm();loadBlogs();
+  }catch(e){alert('Error saving: '+e.message);}
+}
+async function delBlog(id,title){
+  if(!confirm(`Delete "${title}"?`))return;
+  try{await sbFetch(`blogs?id=eq.${id}`,{method:'DELETE'});toast('🗑️ Deleted');loadBlogs();}
+  catch(e){alert('Error: '+e.message);}
+}
+async function loadBlogs(){
+  try{
+    const list=await getBlogs();
+    const el=document.getElementById('bList');
+    if(!list.length){el.innerHTML='<div class="empty">No posts yet! ✍️</div>';return;}
+    el.innerHTML=list.map(b=>`
+      <div class="item">
+        <div class="item-img">${b.thumbnail_url?`<img src="${b.thumbnail_url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" onerror="this.style.opacity=0.2">`:'📖'}</div>
+        <div class="item-info">
+          <div class="item-name">${b.title}</div>
+          <div class="item-sub">${b.tag||'Blog'} · ${b.date||''} · ${b.content?'📄 Article saved':'No article'}</div>
+        </div>
+        <div class="item-actions">
+          <button class="btn-edit" onclick='showBForm(${JSON.stringify(b).replace(/'/g,"&#39;")})'>Edit</button>
+          <button class="btn-del" onclick="delBlog('${b.id}','${(b.title||'').replace(/'/g,"&#39;")}')">Del</button>
+        </div>
+      </div>`).join('');
+  }catch(e){document.getElementById('bList').innerHTML='<div class="empty">Could not load.</div>';}
+}
+
+// ── CATEGORIES ──
+const ICONS=['📚','🃏','📜','📓','🎨','🖼️','⭐','🎁','🧩','🪆','🌙','🕌','📿','🌿','🤲','🌟','💛','🐣','🦋','🎯','📦','🖍️','🎵','🔮','🌸','🎪','🗺️','🧸'];
+function buildIcons(){
+  document.getElementById('iconPicker').innerHTML=ICONS.map(ic=>
+    `<span class="icon-opt" onclick="selIcon('${ic}')">${ic}</span>`).join('');
+}
+function selIcon(ic){
+  document.getElementById('catIcon').value=ic;
+  document.getElementById('selIcon').textContent=ic;
+  document.querySelectorAll('.icon-opt').forEach(s=>s.classList.toggle('sel',s.textContent===ic));
+}
+async function loadCats(){
+  buildIcons();
+  try{
+    allCats=await getCategories();
+    const grid=document.getElementById('catGrid');
+    if(!allCats.length){grid.innerHTML='<div class="empty">No categories.</div>';return;}
+    grid.innerHTML=allCats.map(c=>`
+      <div class="cat-chip">${c.icon} ${c.name}
+        <button class="cat-del" onclick="delCat('${c.id}','${c.name.replace(/'/g,"&#39;")}')">✕</button>
+      </div>`).join('');
+    const sel=document.getElementById('pCat');
+    if(sel)sel.innerHTML=allCats.map(c=>`<option value="${c.name}">${c.icon} ${c.name}</option>`).join('');
+  }catch(e){}
+}
+async function addCat(){
+  const name=document.getElementById('catName').value.trim();
+  const icon=document.getElementById('catIcon').value;
+  if(!name){alert('Enter name!');return;}
+  try{
+    await sbFetch('categories',{method:'POST',body:JSON.stringify({name,icon,sort_order:allCats.length+1})});
+    document.getElementById('catName').value='';
+    toast('✅ Added!');loadCats();
+  }catch(e){alert('Error: '+e.message);}
+}
+async function delCat(id,name){
+  if(!confirm(`Delete "${name}"?`))return;
+  try{await sbFetch(`categories?id=eq.${id}`,{method:'DELETE'});toast('🗑️ Deleted');loadCats();}
+  catch(e){alert('Error: '+e.message);}
+}
+
+// ── SETTINGS ──
+const SOCIALS=[
+  {key:'whatsapp',icon:'💬',label:'WhatsApp',ph:'+918444968880'},
+  {key:'instagram',icon:'📸',label:'Instagram',ph:'ummeibrahim.studio'},
+  {key:'substack',icon:'📬',label:'Substack',ph:'yourname.substack.com'},
+  {key:'beacons',icon:'🔗',label:'Beacons',ph:'beacons.ai/yourname'},
+  {key:'x_twitter',icon:'𝕏',label:'X / Twitter',ph:'@handle'},
+  {key:'threads',icon:'🧵',label:'Threads',ph:'@handle'},
+  {key:'facebook',icon:'📘',label:'Facebook',ph:'facebook.com/page'},
+  {key:'youtube',icon:'▶️',label:'YouTube',ph:'youtube.com/@channel'},
+];
+async function loadSettings(){
+  try{
+    const s=await getSettings();
+    document.getElementById('socialGrid').innerHTML=SOCIALS.map(so=>`
+      <div class="social-item">
+        <span class="social-icon">${so.icon}</span>
+        <div style="flex:1"><label>${so.label}</label>
+        <input type="text" id="s_${so.key}" placeholder="${so.ph}" value="${s[so.key]||''}"></div>
+      </div>`).join('');
+    document.getElementById('sTag').value=s.tagline||'';
+    document.getElementById('sHero').value=s.hero_title||'';
+    document.getElementById('sHeroSub').value=s.hero_subtitle||'';
+    document.getElementById('sDel').value=s.delivery_note||'';
+  }catch(e){toast('Could not load settings.');}
+}
+async function saveSocials(){
+  try{
+    for(const s of SOCIALS)await saveSetting(s.key,document.getElementById('s_'+s.key).value.trim());
+    toast('✅ Saved!');
+  }catch(e){alert('Error: '+e.message);}
+}
+async function saveText(){
+  try{
+    await saveSetting('tagline',document.getElementById('sTag').value.trim());
+    await saveSetting('hero_title',document.getElementById('sHero').value.trim());
+    await saveSetting('hero_subtitle',document.getElementById('sHeroSub').value.trim());
+    await saveSetting('delivery_note',document.getElementById('sDel').value.trim());
+    toast('✅ Saved!');
+  }catch(e){alert('Error: '+e.message);}
+}
+async function changePwd(){
+  const np=document.getElementById('np1').value.trim();
+  const cp=document.getElementById('np2').value.trim();
+  if(!np){alert('Enter password!');return;}
+  if(np!==cp){alert('Passwords do not match!');return;}
+  try{
+    await sbFetch('admin?id=eq.1',{method:'PATCH',body:JSON.stringify({password:np})});
+    toast('✅ Password changed!');
+    document.getElementById('np1').value='';
+    document.getElementById('np2').value='';
+  }catch(e){alert('Error: '+e.message);}
+}
+
+// ── LEADS ──
+let leadsData = [];
+async function loadLeads() {
+  try {
+    leadsData = await sbFetch('leads?order=created_at.desc&select=*');
+    const tbody = document.getElementById('leadsBody');
+    if (!leadsData.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="padding:2rem;text-align:center;color:#8C7A60;">No leads yet. Popup will collect them! 🌙</td></tr>';
+      document.getElementById('leadsCount').textContent = '';
+      return;
+    }
+    tbody.innerHTML = leadsData.map(l => {
+      const date = new Date(l.created_at).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+      return `<tr style="border-bottom:1px solid rgba(184,146,42,0.08);">
+        <td style="padding:12px 16px;font-size:0.88rem;">${l.name||'-'}</td>
+        <td style="padding:12px 16px;">
+          <a href="https://wa.me/${(l.whatsapp||'').replace(/\D/g,'')}" target="_blank"
+            style="color:#25D366;font-size:0.88rem;text-decoration:none;font-weight:600;">
+            💬 ${l.whatsapp||'-'}
+          </a>
+        </td>
+        <td style="padding:12px 16px;font-size:0.85rem;color:#8C7A60;">${l.email||'-'}</td>
+        <td style="padding:12px 16px;font-size:0.78rem;color:#8C7A60;">${date}</td>
+        <td style="padding:12px 16px;">
+          <button onclick="delLead('${l.id}')" class="btn-del">Del</button>
+        </td>
+      </tr>`;
+    }).join('');
+    document.getElementById('leadsCount').textContent = `Total: ${leadsData.length} lead${leadsData.length !== 1 ? 's' : ''}`;
+  } catch(e) {
+    document.getElementById('leadsBody').innerHTML = '<tr><td colspan="5" style="padding:2rem;text-align:center;color:#8C7A60;">Could not load leads.</td></tr>';
+  }
+}
+
+async function delLead(id) {
+  if (!confirm('Delete this lead?')) return;
+  try {
+    await sbFetch(`leads?id=eq.${id}`, { method: 'DELETE' });
+    toast('🗑️ Deleted');
+    loadLeads();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+function exportLeads() {
+  if (!leadsData.length) { alert('No leads to export!'); return; }
+  const rows = [['Name','WhatsApp','Email','Date']];
+  leadsData.forEach(l => {
+    const date = new Date(l.created_at).toLocaleDateString('en-IN');
+    rows.push([l.name||'', l.whatsapp||'', l.email||'', date]);
+  });
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('
+');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'umme-ibrahim-leads.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ CSV downloaded!');
+}
+</script>
+</body>
+</html>
